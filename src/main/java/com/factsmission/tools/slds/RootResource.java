@@ -15,7 +15,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.commons.rdf.IRI;
+import org.apache.clerezza.commons.rdf.Literal;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
+import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -32,6 +34,12 @@ import org.apache.http.util.EntityUtils;
 
 @Path("")
 public class RootResource {
+
+    private final GraphNode config;
+
+    RootResource(GraphNode config) {
+        this.config = config;
+    }
 
     @GET
     @Path("{path : .*}")
@@ -61,12 +69,12 @@ public class RootResource {
 
     @GET
     @Path("debug")
-    public String debug() throws ParseException, IOException {
-        return "hello";
+    public Object debug() throws ParseException, IOException {
+        return System.getProperties();
     }
 
     protected String getSparqlEndpoint() {
-        return "https://lindasprd.netrics.ch:8443/lindas/query";
+        return ((Literal)config.getObjects(SLDS.sparqlEndpoint).next()).getLexicalForm();
     }
     
     protected UriNamespaceTranslator getUriNameSpaceTranslator() {
@@ -81,7 +89,9 @@ public class RootResource {
             final String query = "DESCRIBE <"+effectiveResource.getUnicodeString()+">";
             System.out.println(query);
             httpPost.setEntity(new StringEntity(query, ContentType.create("application/sparql-query", "utf-8")));
+            System.out.println(System.currentTimeMillis());
             try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                System.out.println(System.currentTimeMillis());
                 if (response.getStatusLine().getStatusCode() >= 400) {
                     throw new IOException(response.getStatusLine().getReasonPhrase());
                 }

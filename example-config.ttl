@@ -1,0 +1,3 @@
+@prefix slds: <http://vocab.linked.solutions/slds#> .
+
+<> slds:sparqlEndpoint "https://lindasprd.netrics.ch:8443/lindas/query" .
