@@ -80,6 +80,11 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.clerezza.commons-rdf</groupId>
+    <artifactId>commons-rdf-impl-sparql</artifactId>
+    <version>0.3-SNAPSHOT</version>
+       </dependency>
+        <dependency>
             <groupId>org.apache.clerezza</groupId>
             <artifactId>rdf.jena.serializer</artifactId>
             <version>1.1.0</version>

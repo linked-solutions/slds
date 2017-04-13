@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.MessageBodyWriter;
+import org.apache.clerezza.rdf.utils.graphnodeprovider.GraphNodeProvider;
 import org.glassfish.jersey.netty.httpserver.NettyHttpContainerProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -42,4 +43,5 @@ public class Server implements Runnable{
     protected Object getRootResource() {
         return new RootResource();
     }
+
 }
