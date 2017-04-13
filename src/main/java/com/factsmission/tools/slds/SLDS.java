@@ -7,4 +7,6 @@ import org.apache.clerezza.commons.rdf.IRI;
  */
 public class SLDS {
     public static final IRI sparqlEndpoint = new IRI("http://vocab.linked.solutions/slds#sparqlEndpoint");
+    public static final IRI userName = new IRI("http://vocab.linked.solutions/slds#userName");
+    public static final IRI password = new IRI("http://vocab.linked.solutions/slds#password");
 }

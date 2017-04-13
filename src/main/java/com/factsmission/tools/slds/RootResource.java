@@ -35,6 +35,8 @@ import org.apache.http.util.EntityUtils;
 @Path("")
 public class RootResource {
 
+    
+
     private final GraphNode config;
 
     RootResource(GraphNode config) {
@@ -52,8 +54,7 @@ public class RootResource {
         try {
             final HttpClientBuilder hcb = HttpClientBuilder.create();
             final CredentialsProvider credsProvider = new BasicCredentialsProvider();
-            credsProvider.setCredentials(AuthScope.ANY,
-                    new UsernamePasswordCredentials("public", "public"));
+            credsProvider.setCredentials(AuthScope.ANY, getCredentials());
             SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
                 @Override
                 public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
@@ -67,14 +68,26 @@ public class RootResource {
         }
     }
 
+    protected UsernamePasswordCredentials getCredentials() {
+        return new UsernamePasswordCredentials(getUserName(), getPassword());
+    }
+    
+    private String getUserName() {
+        return getSparqlEndpoint().getLiterals(SLDS.userName).next().getLexicalForm();
+    }
+
+    private String getPassword() {
+        return getSparqlEndpoint().getLiterals(SLDS.password).next().getLexicalForm();
+    }
+
     @GET
     @Path("debug")
     public Object debug() throws ParseException, IOException {
         return System.getProperties();
     }
 
-    protected String getSparqlEndpoint() {
-        return ((Literal)config.getObjects(SLDS.sparqlEndpoint).next()).getLexicalForm();
+    protected GraphNode getSparqlEndpoint() {
+        return config.getObjectNodes(SLDS.sparqlEndpoint).next();
     }
     
     protected UriNamespaceTranslator getUriNameSpaceTranslator() {
@@ -85,7 +98,7 @@ public class RootResource {
     protected Graph getGraphFor(IRI resource) throws IOException {
         IRI effectiveResource = getUriNameSpaceTranslator().reverse().translate(resource);
         try (CloseableHttpClient httpClient = createClient()) {
-            final HttpPost httpPost = new HttpPost(getSparqlEndpoint());
+            final HttpPost httpPost = new HttpPost(((IRI)getSparqlEndpoint().getNode()).getUnicodeString());
             final String query = "DESCRIBE <"+effectiveResource.getUnicodeString()+">";
             System.out.println(query);
             httpPost.setEntity(new StringEntity(query, ContentType.create("application/sparql-query", "utf-8")));
