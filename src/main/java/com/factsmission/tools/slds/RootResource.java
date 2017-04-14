@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
+import java.util.NoSuchElementException;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -102,7 +103,11 @@ public class RootResource {
     }
 
     protected GraphNode getSparqlEndpoint() {
-        return config.getObjectNodes(SLDS.sparqlEndpoint).next();
+        try {
+            return config.getObjectNodes(SLDS.sparqlEndpoint).next();
+        } catch (NoSuchElementException ex) {
+            throw new NoSuchElementException("the resource "+config.getNode()+" has no "+SLDS.sparqlEndpoint+" property.");
+        }
     }
     
     protected IriTranslator getIriTranslator() {

@@ -20,10 +20,11 @@ public class Server implements Runnable{
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
             System.err.println("Argument pointing to configuration required");
+            return;
         }
         final File configFile = new File(args[0]);
         //unfortunately this misses two slashes: configFile.toURI().toString();
-        final String configFileURI = "file://"+configFile.toURI().toString().substring(5);
+        final String configFileURI = "file://"+configFile.toURI().normalize().toString().substring(5);
         final IRI configIRI = new IRI(configFileURI);
         Graph configCraph = Parser.getInstance().parse(new FileInputStream(configFile), 
                 "text/turtle", configIRI);
