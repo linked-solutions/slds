@@ -5,20 +5,22 @@ import org.apache.clerezza.commons.rdf.IRI;
 import org.apache.clerezza.rdf.utils.UriMutatingGraph;
 
 
-public class UriNamespaceTranslator {
+public class IriNamespaceTranslator implements IriTranslator {
     
     final String origPrefix, targetPrefix;
 
     
-    public UriNamespaceTranslator(String origPrefix, String targetPrefix) {
+    public IriNamespaceTranslator(String origPrefix, String targetPrefix) {
         this.origPrefix = origPrefix;
         this.targetPrefix = targetPrefix;
     }
     
-    public UriNamespaceTranslator reverse() {
-        return new UriNamespaceTranslator(targetPrefix, origPrefix);
+    @Override
+    public IriTranslator reverse() {
+        return new IriNamespaceTranslator(targetPrefix, origPrefix);
     }
     
+    @Override
     public IRI translate(IRI orig) {
        String origString = orig.getUnicodeString();
        if (origString.startsWith(origPrefix)) {
@@ -28,6 +30,7 @@ public class UriNamespaceTranslator {
        }
     }
     
+    @Override
     public Graph translate(Graph orig) {
         return new UriMutatingGraph(orig, origPrefix, targetPrefix);
     }

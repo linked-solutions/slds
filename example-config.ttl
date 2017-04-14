@@ -1,6 +1,16 @@
 @prefix slds: <http://vocab.linked.solutions/slds#> .
 
-<> slds:sparqlEndpoint <https://lindasprd.netrics.ch:8443/lindas/query> .
+<> 
+    slds:sparqlEndpoint <https://lindasprd.netrics.ch:8443/lindas/query> ;
+    slds:iriTranslators (
+        [
+            slds:backendPrefix "http://treatment.plazi.org/"; 
+            slds:frontendPrefix "http://localhost:5000/"
+        ]
+        [
+            slds:backendPrefix "http://publication.plazi.org/"; 
+            slds:frontendPrefix "http://127.0.0.1:5000/"
+        ]) .
 
 <https://lindasprd.netrics.ch:8443/lindas/query> 
     slds:userName "public" ;

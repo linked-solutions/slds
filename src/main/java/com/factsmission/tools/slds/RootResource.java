@@ -2,6 +2,7 @@ package com.factsmission.tools.slds;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -12,17 +13,20 @@ import javax.net.ssl.SSLContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.commons.rdf.IRI;
-import org.apache.clerezza.commons.rdf.Literal;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
+import org.apache.clerezza.rdf.ontologies.RDF;
 import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -45,12 +49,19 @@ public class RootResource {
 
     @GET
     @Path("{path : .*}")
-    public Graph getResourceDescription(@Context UriInfo uriInfo) throws IOException {
-        IRI resource = new IRI(uriInfo.getRequestUri().toString());
+    public Graph getResourceDescription(@Context HttpHeaders httpHeaders, @Context UriInfo uriInfo) throws IOException {
+        final URI requestUri = uriInfo.getRequestUri();
+        final String hostHeader = httpHeaders.getRequestHeader("Host").get(0);
+        final int hostHeaderSeparator = hostHeader.indexOf(':');
+        final String host = hostHeaderSeparator > -1 ? 
+                hostHeader.substring(0, hostHeaderSeparator)
+                : hostHeader;
+        final URI fixedUri = UriBuilder.fromUri(requestUri).host(host).build();
+        IRI resource = new IRI(fixedUri.toString());
         return getGraphFor(resource);
     }
 
-    protected CloseableHttpClient createClient() {
+    protected CloseableHttpClient createHttpClient() {
         try {
             final HttpClientBuilder hcb = HttpClientBuilder.create();
             final CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -90,16 +101,38 @@ public class RootResource {
         return config.getObjectNodes(SLDS.sparqlEndpoint).next();
     }
     
-    protected UriNamespaceTranslator getUriNameSpaceTranslator() {
-        return new UriNamespaceTranslator("http://treatment.plazi.org/", 
-                "http://localhost:5000/");
+    protected IriTranslator getIriTranslator() {
+        if (config.getObjectNodes(SLDS.iriTranslators).hasNext()) {
+            final GraphNode next = config.getObjectNodes(SLDS.iriTranslators).next();
+            return getIriTranslatorFromList(next);
+        } else {
+            return new NillIriTranslator();
+        }
     }
 
+    private IriTranslator getIriTranslatorFromList(GraphNode list) {
+        if (list.getNode().equals(RDF.nil)) {
+            return new NillIriTranslator();
+        }
+        return new ChainedIriTranslator(
+                getIriTranslator(list.getObjectNodes(RDF.first).next()),
+                getIriTranslatorFromList(list.getObjectNodes(RDF.rest).next()));
+    }
+    
+    private IriTranslator getIriTranslator(GraphNode node) {
+        return new IriNamespaceTranslator(node.getLiterals(SLDS.backendPrefix).next().getLexicalForm(), 
+                    node.getLiterals(SLDS.frontendPrefix).next().getLexicalForm());
+    }
+    
     protected Graph getGraphFor(IRI resource) throws IOException {
-        IRI effectiveResource = getUriNameSpaceTranslator().reverse().translate(resource);
-        try (CloseableHttpClient httpClient = createClient()) {
-            final HttpPost httpPost = new HttpPost(((IRI)getSparqlEndpoint().getNode()).getUnicodeString());
-            final String query = "DESCRIBE <"+effectiveResource.getUnicodeString()+">";
+        IRI effectiveResource = getIriTranslator().reverse().translate(resource);
+        final String query = getQuery(effectiveResource);
+        return runQuery(query);
+    }
+
+    protected Graph runQuery(final String query) throws IOException {
+        try (CloseableHttpClient httpClient = createHttpClient()) {
+            final HttpPost httpPost = new HttpPost(((IRI)getSparqlEndpoint().getNode()).getUnicodeString());            
             System.out.println(query);
             httpPost.setEntity(new StringEntity(query, ContentType.create("application/sparql-query", "utf-8")));
             System.out.println(System.currentTimeMillis());
@@ -109,12 +142,19 @@ public class RootResource {
                     throw new IOException(response.getStatusLine().getReasonPhrase());
                 }
                 byte[] responseBody = EntityUtils.toByteArray(response.getEntity());
-                return getUriNameSpaceTranslator().translate(Parser.getInstance()
+                return getIriTranslator().translate(Parser.getInstance()
                         .parse(new ByteArrayInputStream(responseBody),
-                        response.getFirstHeader("Content-Type").getValue()));
+                                response.getFirstHeader("Content-Type").getValue()));
             }
         }
     }
+
+    protected static String getQuery(IRI resource) {
+        return "DESCRIBE <"+resource.getUnicodeString()+">";
+    }
+
+    
+
 
     
 
