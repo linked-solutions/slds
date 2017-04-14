@@ -22,6 +22,7 @@ import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.ontologies.RDF;
 import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -65,7 +66,7 @@ public class RootResource {
         try {
             final HttpClientBuilder hcb = HttpClientBuilder.create();
             final CredentialsProvider credsProvider = new BasicCredentialsProvider();
-            credsProvider.setCredentials(AuthScope.ANY, getCredentials());
+            addCredentials(credsProvider);
             SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
                 @Override
                 public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
@@ -79,8 +80,11 @@ public class RootResource {
         }
     }
 
-    protected UsernamePasswordCredentials getCredentials() {
-        return new UsernamePasswordCredentials(getUserName(), getPassword());
+    protected void addCredentials(final CredentialsProvider credsProvider) {
+        if (getSparqlEndpoint().getLiterals(SLDS.userName).hasNext()) {
+            Credentials credentials = new UsernamePasswordCredentials(getUserName(), getPassword());
+            credsProvider.setCredentials(AuthScope.ANY, credentials);
+        }
     }
     
     private String getUserName() {

@@ -48,6 +48,7 @@ public class Server implements Runnable{
     
     protected Set<Object> getJaxRsComponents() {
         Set<Object> result = new HashSet<>();
+        result.add(new ExceptionMapper());
         result.add(getRootResource());
         result.add(getGraphMBW());
         return result;
