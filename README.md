@@ -6,7 +6,7 @@ This project shall provide a minimal usable extendable implementation.
 
 ## Building
 
-    mvn install
+    mvn install -P executable
 
 this will create an executable jar e.g. `slds-1.0-SNAPSHOT.jar` in the target
 directory.
