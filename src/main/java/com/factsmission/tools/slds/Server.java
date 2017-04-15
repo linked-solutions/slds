@@ -3,6 +3,7 @@ package com.factsmission.tools.slds;
 import io.netty.channel.Channel;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +25,10 @@ public class Server implements Runnable{
             System.err.println("Argument pointing to configuration required");
             return;
         }
+        new Server(args).run();
+    }
+    
+    public Server(String[] args) throws FileNotFoundException {
         Graph configCraph = null;
         IRI configIRI = null; //this shall be the IRI of the first argument
         for (int i = 0; i < args.length; i++) {
@@ -39,7 +44,7 @@ public class Server implements Runnable{
                     "text/turtle", currentFileIRI);
             configCraph = configCraph == null? currentFileConfig : new UnionGraph(configCraph, currentFileConfig);
         }
-        new Server(new GraphNode(configIRI, configCraph)).run();
+        this.config = new GraphNode(configIRI, configCraph);
     }
     
     public final GraphNode config;
