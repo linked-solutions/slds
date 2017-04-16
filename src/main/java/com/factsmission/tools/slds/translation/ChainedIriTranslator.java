@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.factsmission.tools.slds;
+package com.factsmission.tools.slds.translation;
 
+import com.factsmission.tools.slds.translation.IriTranslator;
 import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.commons.rdf.IRI;
 

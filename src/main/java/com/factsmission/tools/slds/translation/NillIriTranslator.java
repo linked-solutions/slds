@@ -1,13 +1,9 @@
-package com.factsmission.tools.slds;
+package com.factsmission.tools.slds.translation;
 
 import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.commons.rdf.IRI;
 
-/**
- *
- * @author user
- */
-class NillIriTranslator implements IriTranslator {
+public class NillIriTranslator implements IriTranslator {
 
     public NillIriTranslator() {
     }
