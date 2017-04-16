@@ -100,12 +100,6 @@ public class RootResource {
         return getSparqlEndpoint().getLiterals(SLDS.password).next().getLexicalForm();
     }
 
-    @GET
-    @Path("debug")
-    public Object debug() throws ParseException, IOException {
-        return System.getProperties();
-    }
-
     protected GraphNode getSparqlEndpoint() {
         try {
             return config.getObjectNodes(SLDS.sparqlEndpoint).next();
