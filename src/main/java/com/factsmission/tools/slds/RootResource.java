@@ -55,7 +55,7 @@ public class RootResource {
 
     @GET
     @Path("{path : .*}")
-    public Graph getResourceDescription(@Context HttpHeaders httpHeaders, @Context UriInfo uriInfo) throws IOException {
+    public GraphNode getResourceDescription(@Context HttpHeaders httpHeaders, @Context UriInfo uriInfo) throws IOException {
         final URI requestUri = uriInfo.getRequestUri();
         final String hostHeader = httpHeaders.getRequestHeader("Host").get(0);
         final int hostHeaderSeparator = hostHeader.indexOf(':');
@@ -64,7 +64,7 @@ public class RootResource {
                 : hostHeader;
         final URI fixedUri = UriBuilder.fromUri(requestUri).host(host).build();
         IRI resource = new IRI(fixedUri.toString());
-        return getGraphFor(resource);
+        return getGraphNodeFor(resource);
     }
 
     protected CloseableHttpClient createHttpClient() {
@@ -129,6 +129,10 @@ public class RootResource {
     private IriTranslator getIriTranslator(GraphNode node) {
         return new IriNamespaceTranslator(node.getLiterals(SLDS.backendPrefix).next().getLexicalForm(), 
                     node.getLiterals(SLDS.frontendPrefix).next().getLexicalForm());
+    }
+    
+    protected GraphNode getGraphNodeFor(IRI resource) throws IOException {
+        return new GraphNode(resource, getGraphFor(resource));
     }
     
     protected Graph getGraphFor(IRI resource) throws IOException {

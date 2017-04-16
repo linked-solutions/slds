@@ -72,7 +72,7 @@ public class Server implements Runnable{
     }
 
     protected static MessageBodyWriter getGraphMBW() {
-        return new MyGraphWriter();
+        return new MyGraphNodeWriter();
     }
 
     protected Object getRootResource() {

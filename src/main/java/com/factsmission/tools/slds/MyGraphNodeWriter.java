@@ -2,21 +2,21 @@ package com.factsmission.tools.slds;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.ext.Provider;
-import org.apache.clerezza.jaxrs.rdf.providers.GraphWriter;
+import org.apache.clerezza.jaxrs.rdf.providers.GraphNodeWriter;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 
 /**
- *
- * @author user
+ * This class is necessary, because org.apache.clerezza.jaxrs.rdf.providers.GraphNodeWriter
+ * expects to have a serializer service injected
  */
 @Provider
 @Produces({
     SupportedFormat.RDF_XML, SupportedFormat.TURTLE,
     SupportedFormat.N3, SupportedFormat.N_TRIPLE})
-public class MyGraphWriter extends GraphWriter {
+public class MyGraphNodeWriter extends GraphNodeWriter {
 
-    public MyGraphWriter() {
+    public MyGraphNodeWriter() {
         bindSerializer(Serializer.getInstance());
     }
     
