@@ -26,6 +26,7 @@ import org.apache.clerezza.commons.rdf.IRI;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.ontologies.RDF;
 import org.apache.clerezza.rdf.utils.GraphNode;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -149,8 +150,10 @@ public class RootResource {
             System.out.println(System.currentTimeMillis());
             try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
                 System.out.println(System.currentTimeMillis());
-                if (response.getStatusLine().getStatusCode() >= 400) {
-                    throw new IOException(response.getStatusLine().getReasonPhrase());
+                final StatusLine statusLine = response.getStatusLine();
+                if (statusLine.getStatusCode() >= 400) {
+                    throw new IOException("HTTP "+statusLine.getStatusCode()
+                            +" "+statusLine.getReasonPhrase());
                 }
                 byte[] responseBody = EntityUtils.toByteArray(response.getEntity());
                 return getIriTranslator().translate(Parser.getInstance()
