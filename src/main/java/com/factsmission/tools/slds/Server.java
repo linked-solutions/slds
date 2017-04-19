@@ -55,7 +55,8 @@ public class Server implements Runnable{
     
     @Override
     public void run() {
-        URI baseUri = UriBuilder.fromUri("http://localhost/").port(5000).build();
+        int port = Integer.parseInt(config.getLiterals(SLDS.port).next().getLexicalForm());
+        URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
         ResourceConfig jerseyConfig = new ResourceConfig();
         for (Object jaxRsComponent : getJaxRsComponents()) {
             jerseyConfig.register(jaxRsComponent);

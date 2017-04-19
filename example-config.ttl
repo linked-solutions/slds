@@ -1,6 +1,7 @@
 @prefix slds: <http://vocab.linked.solutions/slds#> .
 
 <> 
+    slds:port 5000 ;
     slds:sparqlEndpoint <https://lindasprd.netrics.ch:8443/lindas/query> ;
     slds:iriTranslators (
         [

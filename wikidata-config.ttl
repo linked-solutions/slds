@@ -1,0 +1,10 @@
+@prefix slds: <http://vocab.linked.solutions/slds#> .
+
+<> 
+    slds:port 5000 ;
+    slds:sparqlEndpoint <https://query.wikidata.org/sparql> ;
+    slds:iriTranslators (
+        [
+            slds:backendPrefix "http://www.wikidata.org/"; 
+            slds:frontendPrefix "http://localhost:5000/"
+        ]) .

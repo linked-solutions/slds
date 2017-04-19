@@ -1,0 +1,12 @@
+# Currently doesn't work because of https://www.mail-archive.com/virtuoso-users@lists.sourceforge.net/msg07984.html
+
+@prefix slds: <http://vocab.linked.solutions/slds#> .
+
+<> 
+    slds:port 5000 ;
+    slds:sparqlEndpoint <https://dbpedia.org/sparql> ;
+    slds:iriTranslators (
+        [
+            slds:backendPrefix "http://dbpedia.org/"; 
+            slds:frontendPrefix "http://localhost:5000/"
+        ]) .
