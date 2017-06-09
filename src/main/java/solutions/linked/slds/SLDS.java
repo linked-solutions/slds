@@ -1,4 +1,4 @@
-package com.factsmission.tools.slds;
+package solutions.linked.slds;
 
 import org.apache.clerezza.commons.rdf.IRI;
 

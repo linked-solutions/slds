@@ -1,9 +1,9 @@
-package com.factsmission.tools.slds;
+package solutions.linked.slds;
 
-import com.factsmission.tools.slds.translation.ChainedIriTranslator;
-import com.factsmission.tools.slds.translation.IriTranslator;
-import com.factsmission.tools.slds.translation.IriNamespaceTranslator;
-import com.factsmission.tools.slds.translation.NillIriTranslator;
+import solutions.linked.slds.translation.ChainedIriTranslator;
+import solutions.linked.slds.translation.IriTranslator;
+import solutions.linked.slds.translation.IriNamespaceTranslator;
+import solutions.linked.slds.translation.NillIriTranslator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;

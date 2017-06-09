@@ -1,4 +1,4 @@
-package com.factsmission.tools.slds;
+package solutions.linked.slds;
 
 import io.netty.channel.Channel;
 import java.io.File;

@@ -9,7 +9,7 @@ as an example.
 
     mvn install -P executable
 
-this will create an executable jar e.g. `slds-1.0-SNAPSHOT.jar` in the target
+this will create an executable jar e.g. `slds-1.0.0-SNAPSHOT.jar` in the target
 directory.
 
 ## Running
@@ -17,7 +17,7 @@ directory.
 Run the executable jar with one argument pointing to the configuration in a
 turtle file, for example
 
-    java -jar slds-1-SNAPSHOT.jar ../example-config.ttl
+    java -jar slds-1.0.0-SNAPSHOT.jar ../example-config.ttl
 
 ### Configuration
 

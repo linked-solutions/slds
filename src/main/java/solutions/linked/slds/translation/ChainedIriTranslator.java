@@ -1,4 +1,4 @@
-package com.factsmission.tools.slds.translation;
+package solutions.linked.slds.translation;
 
 import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.commons.rdf.IRI;

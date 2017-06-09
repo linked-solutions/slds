@@ -1,4 +1,4 @@
-package com.factsmission.tools.slds;
+package solutions.linked.slds;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.ext.Provider;
