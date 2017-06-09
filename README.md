@@ -21,22 +21,24 @@ turtle file, for example
 ### Configuration
 
 The configuration file is a Turtle file with one resource matching the IRI of
-the location of the file, i.e. the resource which can be refered in Turtle as 
+the location of the file, i.e. the resource which can be referred in Turtle as 
 `<>`.
 
 ```
 @prefix slds: <http://vocab.linked.solutions/slds#> .
 ```
-Defining the `slds` makes the rest of the file more compact and easier to read.
+Defining the `slds` prefix makes the rest of the file more compact and easier
+to read.
 ```
 <> 
     slds:port 5000 ;
-    slds:sparqlEndpoint <https://lindasprd.netrics.ch:8443/lindas/query> ;
+    slds:sparqlEndpoint <https://lindasprd.netrics.ch:8443/lindas/query> .
 ```
 The above defines the port on which SLDS shall listen and the SPARQL Endpoint
 SLDS shall query. 
 
 ```
+<>
     slds:iriTranslators (
         [
             slds:backendPrefix "http://treatment.plazi.org/"; 
