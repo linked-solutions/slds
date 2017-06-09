@@ -2,7 +2,8 @@
 
 Expose Resources from a SPARQL Server as Linked Data.
 
-This project shall provide a minimal usable extendable implementation.
+This project shall provide a minimal usable extendable implementation and serve
+as an example.
 
 ## Building
 
