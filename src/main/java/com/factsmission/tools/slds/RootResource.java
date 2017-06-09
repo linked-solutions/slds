@@ -75,7 +75,7 @@ public class RootResource {
             addCredentials(credsProvider);
             SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
                 @Override
-                public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
                     return true;
                 }
             }).build();

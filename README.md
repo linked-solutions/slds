@@ -61,3 +61,9 @@ map to prefixes in the IRIs in the triple store (backend-prefix).
 ```
 If the SPARQL endpoint needs authentication the username and password can be
 specified as properties of the SPARQL Endpoint resource itself.
+
+### SSL Certificates
+
+SLDS conatains code to accept any SSL certificate the SPARQL Server (or the man
+in the middle) uses. Override `RootResource.createHttpClient()` for some serious
+security.  
