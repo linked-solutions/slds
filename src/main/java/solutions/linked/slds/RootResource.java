@@ -58,12 +58,17 @@ public class RootResource {
     @Path("{path : .*}")
     public GraphNode getResourceDescription(@Context HttpHeaders httpHeaders, @Context UriInfo uriInfo) throws IOException {
         final URI requestUri = uriInfo.getRequestUri();
+        //The server unfirtunately takes the hostname and port from its config
+        //The following fixes this
         final String hostHeader = httpHeaders.getRequestHeader("Host").get(0);
         final int hostHeaderSeparator = hostHeader.indexOf(':');
         final String host = hostHeaderSeparator > -1 ? 
                 hostHeader.substring(0, hostHeaderSeparator)
                 : hostHeader;
-        final URI fixedUri = UriBuilder.fromUri(requestUri).host(host).build();
+        final int port  = hostHeaderSeparator > -1 ?
+                Integer.parseInt(hostHeader.substring(hostHeaderSeparator+1))
+                : -1;
+        final URI fixedUri = UriBuilder.fromUri(requestUri).port(port).host(host).build();
         IRI resource = new IRI(fixedUri.toString());
         return getGraphNodeFor(resource);
     }
