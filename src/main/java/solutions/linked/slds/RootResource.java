@@ -1,20 +1,31 @@
+/*
+ * The MIT License
+ *
+ * Copyright 2017 FactsMission AG, Switzerland.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package solutions.linked.slds;
 
-import solutions.linked.slds.translation.ChainedIriTranslator;
-import solutions.linked.slds.translation.IriTranslator;
-import solutions.linked.slds.translation.IriNamespaceTranslator;
-import solutions.linked.slds.translation.NillIriTranslator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.text.ParseException;
-import java.util.NoSuchElementException;
-import javax.net.ssl.SSLContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -24,24 +35,15 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.commons.rdf.IRI;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
-import org.apache.clerezza.rdf.ontologies.RDF;
 import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
+import solutions.linked.slds.util.IriTranslatorProvider;
 
 @Path("")
 public class RootResource {
@@ -49,9 +51,13 @@ public class RootResource {
     
 
     private final GraphNode config;
+    private final IriTranslatorProvider iriTranslatorProvider;
+    private final ConfigUtils configUtils;
 
     RootResource(GraphNode config) {
         this.config = config;
+        this.iriTranslatorProvider = new IriTranslatorProvider(config);
+        this.configUtils = new ConfigUtils(config);
     }
 
     @GET
@@ -73,83 +79,21 @@ public class RootResource {
         return getGraphNodeFor(resource);
     }
 
-    protected CloseableHttpClient createHttpClient() {
-        try {
-            final HttpClientBuilder hcb = HttpClientBuilder.create();
-            final CredentialsProvider credsProvider = new BasicCredentialsProvider();
-            addCredentials(credsProvider);
-            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-                @Override
-                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    return true;
-                }
-            }).build();
-            hcb.setSSLContext(sslContext);
-            return hcb.setDefaultCredentialsProvider(credsProvider).build();
-        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    protected void addCredentials(final CredentialsProvider credsProvider) {
-        if (getSparqlEndpoint().getLiterals(SLDS.userName).hasNext()) {
-            Credentials credentials = new UsernamePasswordCredentials(getUserName(), getPassword());
-            credsProvider.setCredentials(AuthScope.ANY, credentials);
-        }
-    }
     
-    private String getUserName() {
-        return getSparqlEndpoint().getLiterals(SLDS.userName).next().getLexicalForm();
-    }
-
-    private String getPassword() {
-        return getSparqlEndpoint().getLiterals(SLDS.password).next().getLexicalForm();
-    }
-
-    protected GraphNode getSparqlEndpoint() {
-        try {
-            return config.getObjectNodes(SLDS.sparqlEndpoint).next();
-        } catch (NoSuchElementException ex) {
-            throw new NoSuchElementException("the resource "+config.getNode()+" has no "+SLDS.sparqlEndpoint+" property.");
-        }
-    }
-    
-    protected IriTranslator getIriTranslator() {
-        if (config.getObjectNodes(SLDS.iriTranslators).hasNext()) {
-            final GraphNode next = config.getObjectNodes(SLDS.iriTranslators).next();
-            return getIriTranslatorFromList(next);
-        } else {
-            return new NillIriTranslator();
-        }
-    }
-
-    private IriTranslator getIriTranslatorFromList(GraphNode list) {
-        if (list.getNode().equals(RDF.nil)) {
-            return new NillIriTranslator();
-        }
-        return new ChainedIriTranslator(
-                getIriTranslator(list.getObjectNodes(RDF.first).next()),
-                getIriTranslatorFromList(list.getObjectNodes(RDF.rest).next()));
-    }
-    
-    private IriTranslator getIriTranslator(GraphNode node) {
-        return new IriNamespaceTranslator(node.getLiterals(SLDS.backendPrefix).next().getLexicalForm(), 
-                    node.getLiterals(SLDS.frontendPrefix).next().getLexicalForm());
-    }
-    
+       
     protected GraphNode getGraphNodeFor(IRI resource) throws IOException {
         return new GraphNode(resource, getGraphFor(resource));
     }
     
     protected Graph getGraphFor(IRI resource) throws IOException {
-        IRI effectiveResource = getIriTranslator().reverse().translate(resource);
+        IRI effectiveResource = iriTranslatorProvider.getIriTranslator().reverse().translate(resource);
         final String query = getQuery(effectiveResource);
         return runQuery(query);
     }
 
     protected Graph runQuery(final String query) throws IOException {
-        try (CloseableHttpClient httpClient = createHttpClient()) {
-            final HttpPost httpPost = new HttpPost(((IRI)getSparqlEndpoint().getNode()).getUnicodeString());            
+        try (CloseableHttpClient httpClient = configUtils.createHttpClient()) {
+            final HttpPost httpPost = new HttpPost(configUtils.getSparqlEndpointUri().getUnicodeString());            
             System.out.println(query);
             httpPost.setEntity(new StringEntity(query, ContentType.create("application/sparql-query", "utf-8")));
             System.out.println(System.currentTimeMillis());
@@ -161,7 +105,7 @@ public class RootResource {
                             +" "+statusLine.getReasonPhrase());
                 }
                 byte[] responseBody = EntityUtils.toByteArray(response.getEntity());
-                return getIriTranslator().translate(Parser.getInstance()
+                return iriTranslatorProvider.getIriTranslator().translate(Parser.getInstance()
                         .parse(new ByteArrayInputStream(responseBody),
                                 response.getFirstHeader("Content-Type").getValue()));
             }
@@ -171,10 +115,5 @@ public class RootResource {
     protected static String getQuery(IRI resource) {
         return "DESCRIBE <"+resource.getUnicodeString()+">";
     }
-
     
-
-
-    
-
 }
