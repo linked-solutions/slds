@@ -54,7 +54,7 @@ public class RootResource {
     private final IriTranslatorProvider iriTranslatorProvider;
     private final ConfigUtils configUtils;
 
-    RootResource(GraphNode config) {
+    public RootResource(GraphNode config) {
         this.config = config;
         this.iriTranslatorProvider = new IriTranslatorProvider(config);
         this.configUtils = new ConfigUtils(config);
