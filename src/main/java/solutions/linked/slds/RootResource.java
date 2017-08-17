@@ -87,6 +87,10 @@ public class RootResource {
     
     protected Graph getGraphFor(IRI resource) throws IOException {
         IRI effectiveResource = iriTranslatorProvider.getIriTranslator().reverse().translate(resource);
+        return getGrapForTargetIri(effectiveResource);
+    }
+
+    protected Graph getGrapForTargetIri(IRI effectiveResource) throws IOException {
         final String query = getQuery(effectiveResource);
         return runQuery(query);
     }
