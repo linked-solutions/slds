@@ -86,11 +86,11 @@ public class ConfigUtils {
         }
     }
     
-    private String getUserName() {
+    public String getUserName() {
         return getSparqlEndpointNode().getLiterals(SLDS.userName).next().getLexicalForm();
     }
 
-    private String getPassword() {
+    public String getPassword() {
         return getSparqlEndpointNode().getLiterals(SLDS.password).next().getLexicalForm();
     }
 
