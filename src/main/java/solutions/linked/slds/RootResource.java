@@ -116,7 +116,7 @@ public class RootResource {
         }
     }
 
-    protected static String getQuery(IRI resource) {
+    protected String getQuery(IRI resource) {
         return "DESCRIBE <"+resource.getUnicodeString()+">";
     }
     
