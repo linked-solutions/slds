@@ -4,9 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "compile",
+            "taskName": "install",
             "type": "shell",
-            "command": "mvn -B compile",
+            "command": "mvn -B install",
             "group": "build"
         }
     ]
