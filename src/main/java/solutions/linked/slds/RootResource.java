@@ -25,8 +25,12 @@ package solutions.linked.slds;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
@@ -96,37 +100,43 @@ public class RootResource {
 
     protected Graph getGraphForTargetIri(IRI effectiveResource) throws IOException {
         final String[] queries = getQueries(effectiveResource);
-        Graph[] graphs = Arrays.asList(queries).stream().map(q -> {
-			try {
-				return runQuery(q);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		})
-                        .collect(Collectors.toList()).toArray(new Graph[queries.length]);
-        UnionGraph result = new UnionGraph(graphs);
-        return result;
+        return runQueries(queries);
     }
 
-    protected Graph runQuery(final String query) throws IOException {
+    /**
+     * The response of multiple queries are concatened so that the same b-node ID results in the same node
+     */
+    protected Graph runQueries(final String[] queries) throws IOException {
+        InputStream in = new SequenceInputStream(getQueryResultsAsStream(queries));
+        return iriTranslatorProvider.getIriTranslator().translate(Parser.getInstance()
+                            .parse(in, "application/n-triples"));
+    }
+    protected Enumeration<? extends InputStream> getQueryResultsAsStream(final String[] queries) throws IOException {
+        
         try (CloseableHttpClient httpClient = configUtils.createHttpClient()) {
-            final HttpPost httpPost = new HttpPost(configUtils.getSparqlEndpointUri().getUnicodeString());            
-            System.out.println(query);
-            httpPost.setEntity(new StringEntity(query, ContentType.create("application/sparql-query", "utf-8")));
-            System.out.println(System.currentTimeMillis());
-            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                System.out.println(System.currentTimeMillis());
-                final StatusLine statusLine = response.getStatusLine();
-                if (statusLine.getStatusCode() >= 400) {
-                    throw new IOException("HTTP "+statusLine.getStatusCode()
-                            +" "+statusLine.getReasonPhrase());
+            return Collections.enumeration(Arrays.asList(queries).stream().map(query -> {
+                try {
+                    final HttpPost httpPost = new HttpPost(configUtils.getSparqlEndpointUri().getUnicodeString()); 
+                    httpPost.setHeader("Accept", "application/n-triples");           
+                    httpPost.setEntity(new StringEntity(query, ContentType.create("application/sparql-query", "utf-8")));
+                    try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                        final StatusLine statusLine = response.getStatusLine();
+                        if (statusLine.getStatusCode() >= 400) {
+                            throw new IOException("HTTP "+statusLine.getStatusCode()
+                                    +" "+statusLine.getReasonPhrase());
+                        }
+                        String responseType = response.getFirstHeader("Content-Type").getValue();
+                        if (!responseType.startsWith("application/n-triples")) {
+                            throw new RuntimeException("The SPARQL server did not retun n-triples but " + responseType);
+                        }
+                        byte[] responseBody = EntityUtils.toByteArray(response.getEntity());
+                        return (InputStream) new ByteArrayInputStream(responseBody);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-                byte[] responseBody = EntityUtils.toByteArray(response.getEntity());
-                return iriTranslatorProvider.getIriTranslator().translate(Parser.getInstance()
-                        .parse(new ByteArrayInputStream(responseBody),
-                                response.getFirstHeader("Content-Type").getValue()));
-            }
-        }
+            }).collect(Collectors.toList()));
+        }   
     }
 
     protected String[] getQueries(IRI resource) {
