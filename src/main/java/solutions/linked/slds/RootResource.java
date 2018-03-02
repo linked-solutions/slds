@@ -26,6 +26,9 @@ package solutions.linked.slds;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -36,6 +39,7 @@ import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.commons.rdf.IRI;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.utils.GraphNode;
+import org.apache.clerezza.rdf.utils.UnionGraph;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -91,8 +95,17 @@ public class RootResource {
     }
 
     protected Graph getGraphForTargetIri(IRI effectiveResource) throws IOException {
-        final String query = getQuery(effectiveResource);
-        return runQuery(query);
+        final String[] queries = getQueries(effectiveResource);
+        Graph[] graphs = Arrays.asList(queries).stream().map(q -> {
+			try {
+				return runQuery(q);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		})
+                        .collect(Collectors.toList()).toArray(new Graph[queries.length]);
+        UnionGraph result = new UnionGraph(graphs);
+        return result;
     }
 
     protected Graph runQuery(final String query) throws IOException {
@@ -116,8 +129,11 @@ public class RootResource {
         }
     }
 
-    protected String getQuery(IRI resource) {
-        return "DESCRIBE <"+resource.getUnicodeString()+">";
+    protected String[] getQueries(IRI resource) {
+        return new String[]{
+            "DESCRIBE <"+resource.getUnicodeString()+">",
+            "CONSTRUCT {?sub ?pred ?obj} WHERE { GRAPH <"+resource.getUnicodeString()+"> {  ?sub ?pred ?obj . } }"
+        };
     }
     
 }
