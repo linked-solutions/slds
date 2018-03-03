@@ -70,7 +70,7 @@ public class RootResource {
 
     @GET
     @Path("{path : .*}")
-    public GraphNode getResourceDescription(@Context HttpHeaders httpHeaders, @Context UriInfo uriInfo) throws IOException {
+    public Graph getResourceDescription(@Context HttpHeaders httpHeaders, @Context UriInfo uriInfo) throws IOException {
         final URI requestUri = uriInfo.getRequestUri();
         //The server unfirtunately takes the hostname and port from its config
         //The following fixes this
@@ -84,14 +84,14 @@ public class RootResource {
                 : -1;
         final URI fixedUri = UriBuilder.fromUri(requestUri).port(port).host(host).build();
         IRI resource = new IRI(fixedUri.toString());
-        return getGraphNodeFor(resource);
+        return getGraphFor(resource);
     }
 
     
        
-    protected GraphNode getGraphNodeFor(IRI resource) throws IOException {
+    /*protected GraphNode getGraphNodeFor(IRI resource) throws IOException {
         return new GraphNode(resource, getGraphFor(resource));
-    }
+    }*/
     
     protected Graph getGraphFor(IRI resource) throws IOException {
         IRI effectiveResource = iriTranslatorProvider.getIriTranslator().reverse().translate(resource);
@@ -142,6 +142,7 @@ public class RootResource {
     protected String[] getQueries(IRI resource) {
         return new String[]{
             "DESCRIBE <"+resource.getUnicodeString()+">",
+            "CONSTRUCT {?sub ?pred <"+resource.getUnicodeString()+">} WHERE {GRAPH ?g {?sub ?pred  <"+resource.getUnicodeString()+"> }  }", //Not what we really want as we don't get a full symmetric CBD
             "CONSTRUCT {?sub ?pred ?obj} WHERE { GRAPH <"+resource.getUnicodeString()+"> {  ?sub ?pred ?obj . } }"
         };
     }
