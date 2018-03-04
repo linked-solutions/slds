@@ -93,6 +93,7 @@ public class Server implements Runnable{
         result.add(getRootResource());
         result.add(getGraphMBW());
         result.add(new CORSFilter());
+        result.add(new EffectiveRequestUriFilter());
         return result;
     }
 
