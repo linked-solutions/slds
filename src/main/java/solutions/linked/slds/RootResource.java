@@ -131,7 +131,6 @@ public class RootResource {
     protected String[] getQueries(IRI resource) {
         return new String[]{
             "DESCRIBE <"+resource.getUnicodeString()+">",
-            "CONSTRUCT {?sub ?pred <"+resource.getUnicodeString()+">} WHERE {GRAPH ?g {?sub ?pred  <"+resource.getUnicodeString()+"> }  }", //Not what we really want as we don't get a full symmetric CBD
             "CONSTRUCT {?sub ?pred ?obj} WHERE { GRAPH <"+resource.getUnicodeString()+"> {  ?sub ?pred ?obj . } }"
         };
     }
