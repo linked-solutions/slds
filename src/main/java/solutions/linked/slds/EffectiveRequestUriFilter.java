@@ -51,7 +51,14 @@ public class EffectiveRequestUriFilter implements ContainerRequestFilter {
         final int port  = hostHeaderSeparator > -1 ?
                 Integer.parseInt(hostHeader.substring(hostHeaderSeparator+1))
                 : -1;
-        final URI fixedUri = UriBuilder.fromUri(requestUri).port(port).host(host).build();
+        final String xForwardedProto = requestContext.getHeaders().getFirst("X-Forwarded-Proto");
+        final UriBuilder uriBuilder;
+        if (xForwardedProto != null) {
+            uriBuilder = UriBuilder.fromUri(requestUri).scheme(xForwardedProto);
+        } else {
+            uriBuilder = UriBuilder.fromUri(requestUri);
+        }
+        final URI fixedUri = uriBuilder.port(port).host(host).build();
         requestContext.setRequestUri(fixedUri);
 	}
 
