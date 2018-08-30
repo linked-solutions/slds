@@ -6,13 +6,14 @@
     "configurations": [
         {
             "type": "java",
+            "projectName": "slds",
             "name": "Debug (Launch)",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopOnEntry": false,
             "mainClass": "solutions.linked.slds.Server",
-            "args": "wikidata-config.ttl"
+            "args": "fuseki-config.ttl"
         }
     ]
 }
