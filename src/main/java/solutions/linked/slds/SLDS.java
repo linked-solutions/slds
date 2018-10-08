@@ -13,4 +13,5 @@ public class SLDS {
     public static final IRI backendPrefix = new IRI("http://vocab.linked.solutions/slds#backendPrefix");
     public static final IRI frontendPrefix = new IRI("http://vocab.linked.solutions/slds#frontendPrefix");
     public static final IRI port = new IRI("http://vocab.linked.solutions/slds#port");
+    public static final IRI enableVituosoWorkAround = new IRI("http://vocab.linked.solutions/slds#enableVituosoWorkAround");
 }

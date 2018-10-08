@@ -28,9 +28,12 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import javax.net.ssl.SSLContext;
 import org.apache.clerezza.commons.rdf.IRI;
+import org.apache.clerezza.commons.rdf.Literal;
+import org.apache.clerezza.rdf.core.LiteralFactory;
 import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -104,5 +107,10 @@ public class ConfigUtils {
     
     public IRI getSparqlEndpointUri() {
         return (IRI) getSparqlEndpointNode().getNode();
+    }
+    
+    public boolean enableVituosoWorkAround() {
+        final Iterator<Literal> literals = config.getLiterals(SLDS.enableVituosoWorkAround);
+        return (literals.hasNext() && LiteralFactory.getInstance().createObject(Boolean.class, literals.next()));
     }
 }

@@ -105,8 +105,13 @@ public class RootResource {
         try (CloseableHttpClient httpClient = configUtils.createHttpClient()) {
             return Collections.enumeration(Arrays.asList(queries).stream().map(query -> {
                 try {
-                    final HttpPost httpPost = new HttpPost(configUtils.getSparqlEndpointUri().getUnicodeString()); 
-                    httpPost.setHeader("Accept", "application/n-triples");           
+                    final HttpPost httpPost = new HttpPost(configUtils.getSparqlEndpointUri().getUnicodeString());
+                    if (configUtils.enableVituosoWorkAround()) {
+                        //reason: https://github.com/openlink/virtuoso-opensource/issues/516
+                       httpPost.setHeader("Accept", "text/plain");           
+                    } else {
+                       httpPost.setHeader("Accept", "application/n-triples");      
+                    }
                     httpPost.setEntity(new StringEntity(query, ContentType.create("application/sparql-query", "utf-8")));
                     try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
                         final StatusLine statusLine = response.getStatusLine();
@@ -115,7 +120,9 @@ public class RootResource {
                                     +" "+statusLine.getReasonPhrase());
                         }
                         String responseType = response.getFirstHeader("Content-Type").getValue();
-                        if (!responseType.startsWith("application/n-triples")) {
+                        if (!(responseType.startsWith("application/n-triples") || (configUtils.enableVituosoWorkAround() && responseType.startsWith("text/plain")))) {
+                            System.err.println("The SPARQL server did not retun n-triples but " + responseType);
+                            System.err.println(new String(EntityUtils.toByteArray(response.getEntity()), "utf-8"));
                             throw new RuntimeException("The SPARQL server did not retun n-triples but " + responseType);
                         }
                         byte[] responseBody = EntityUtils.toByteArray(response.getEntity());
