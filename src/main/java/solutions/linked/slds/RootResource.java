@@ -31,6 +31,8 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
@@ -136,10 +138,16 @@ public class RootResource {
     }
 
     protected String[] getQueries(IRI resource) {
-        return new String[]{
-            "DESCRIBE <"+resource.getUnicodeString()+">",
-            "CONSTRUCT {?sub ?pred ?obj} WHERE { GRAPH <"+resource.getUnicodeString()+"> {  ?sub ?pred ?obj . } }"
-        };
+        String describeQuery = "DESCRIBE <"+resource.getUnicodeString()+">";
+        Set<String> resultSet = new HashSet<String>();
+        if (configUtils.enableVituosoWorkAround()) {
+            resultSet.add("define sql:describe-mode \"CBD\" "+describeQuery);
+            resultSet.add("define sql:describe-mode \"OBJCBD\" "+describeQuery);
+        } else { 
+            resultSet.add(describeQuery);
+        }
+        resultSet.add("CONSTRUCT {?sub ?pred ?obj} WHERE { GRAPH <"+resource.getUnicodeString()+"> {  ?sub ?pred ?obj . } }");
+        return resultSet.toArray(new String[resultSet.size()]);
     }
     
 }
