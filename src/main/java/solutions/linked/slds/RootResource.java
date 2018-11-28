@@ -142,8 +142,8 @@ public class RootResource {
         Set<String> resultSet = new HashSet<String>();
         if (configUtils.enableVituosoWorkAround()) {
             resultSet.add("define sql:describe-mode \"CBD\" "+describeQuery);
-            resultSet.add("define sql:describe-mode \"OBJCBD\" "+describeQuery);
         } else { 
+            //resultSet.add("define sql:describe-mode \"OBJCBD\" "+describeQuery);
             resultSet.add(describeQuery);
         }
         resultSet.add("CONSTRUCT {?sub ?pred ?obj} WHERE { GRAPH <"+resource.getUnicodeString()+"> {  ?sub ?pred ?obj . } }");
