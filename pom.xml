@@ -131,7 +131,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <build>
-                <finalName>${finalName}</finalName>
+                <finalName>${finalName}-executable</finalName>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

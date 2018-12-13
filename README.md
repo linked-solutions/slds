@@ -17,7 +17,7 @@ directory.
 Run the executable jar with one argument pointing to the configuration in a
 turtle file, for example
 
-    java -jar slds-1.0.0-SNAPSHOT.jar ../example-config.ttl
+    java -jar slds-1.0.0-SNAPSHOT-executable.jar ../example-config.ttl
 
 ### Configuration
 
