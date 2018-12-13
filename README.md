@@ -5,19 +5,34 @@ Expose Resources from a SPARQL Server as Linked Data.
 This project shall provide a minimal usable extendable implementation and serve
 as an example.
 
-## Building
+## Building and running
+
+You can build slds directly with [maven](https://maven.apache.org/) or use [Docker](https://docker.com). 
+
+### Maven
+
+Run the following command:
 
     mvn install -P executable
 
 this will create an executable jar e.g. `slds-1.0.0-SNAPSHOT.jar` in the target
 directory.
 
-## Running
-
 Run the executable jar with one argument pointing to the configuration in a
 turtle file, for example
 
     java -jar slds-1.0.0-SNAPSHOT-executable.jar ../example-config.ttl
+
+### Using Docker
+
+You can build a docker image named `slds` with
+
+    docker build -t slds .
+
+The image will launch slds with `/config.ttl` as configuration by default. The easiest way to start it with you own config is to mount a file from your local filesystem at that location. You can then run the image with something like:
+
+    docker run -ti -p 5000:5000 -v C:\Users\me\path\to\config.ttl:/config.ttl slds 
+
 
 ### Configuration
 
