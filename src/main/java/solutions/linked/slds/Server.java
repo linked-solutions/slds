@@ -57,6 +57,9 @@ public class Server implements Runnable{
         for (int i = 0; i < args.length; i++) {
 
             final File configFile = new File(args[i]);
+            if (!configFile.exists()) {
+                throw new FileNotFoundException("Could not find: "+configFile.getAbsolutePath());
+            }
             //unfortunately this misses two slashes: configFile.toURI().toString();
             final String configFileURI = "file://"+configFile.toURI().normalize().toString().substring(5);
             final IRI currentFileIRI = new IRI(configFileURI);
