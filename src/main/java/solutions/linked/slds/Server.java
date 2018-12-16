@@ -100,12 +100,16 @@ public class Server implements Runnable{
         return result;
     }
 
-    protected static MessageBodyWriter getGraphMBW() {
+    protected MessageBodyWriter getGraphMBW() {
         return new MyGraphWriter();
     }
 
     protected Object getRootResource() {
-        return new RootResource(config);
+        return new ExtensibleRootResource(config);
     }
+    
+    /*protected ResourceDescriptionProvider getResourceDescriptionProvider() {
+        return Resou
+    }*/
 
 }

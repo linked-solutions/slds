@@ -48,22 +48,30 @@ to read.
 ```
 <> 
     slds:port 5000 ;
-    slds:sparqlEndpoint <https://lindasprd.netrics.ch:8443/lindas/query> .
+    slds:resourceDescriptionProvider [
+        slds:javaClass "solutions.linked.slds.providers.GraphAndContext";
+        slds:sparqlEndpoint <https://lindasprd.netrics.ch:8443/lindas/query> 
+    ].
 ```
 The above defines the port on which SLDS shall listen and the SPARQL Endpoint
 SLDS shall query. 
 
 ```
-<>
-    slds:iriTranslators (
-        [
-            slds:backendPrefix "http://treatment.plazi.org/"; 
-            slds:frontendPrefix "http://localhost:5000/"
-        ]
-        [
-            slds:backendPrefix "http://publication.plazi.org/"; 
-            slds:frontendPrefix "http://127.0.0.1:5000/"
-        ]) .
+<> 
+    slds:port 5000 ;
+    slds:resourceDescriptionProvider [
+        slds:javaClass "solutions.linked.slds.providers.GraphAndContext";
+        slds:sparqlEndpoint <https://lindasprd.netrics.ch:8443/lindas/query> 
+        slds:iriTranslators (
+            [
+                slds:backendPrefix "http://treatment.plazi.org/"; 
+                slds:frontendPrefix "http://localhost:5000/"
+            ]
+            [
+                slds:backendPrefix "http://publication.plazi.org/"; 
+                slds:frontendPrefix "http://127.0.0.1:5000/"
+            ]) 
+    ].
 ```
 Unless the resources in the triple store already have the URIs under which they 
 are to be published IRI-Translation rules are required. The above two additional
@@ -81,5 +89,5 @@ specified as properties of the SPARQL Endpoint resource itself.
 ### SSL Certificates
 
 SLDS conatains code to accept any SSL certificate the SPARQL Server (or the man
-in the middle) uses. Override `RootResource.createHttpClient()` for some serious
+in the middle) uses. Override `ConfigUtils.createHttpClient()` for some serious
 security.  

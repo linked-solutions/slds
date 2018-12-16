@@ -4,7 +4,10 @@
 
 <> 
     slds:port 5000 ;
-    slds:sparqlEndpoint <https://dbpedia.org/sparql> ;
+    slds:resourceDescriptionProvider {
+        xlds:class "solutions.linked.xlds.providers.GraphAndContext";
+        slds:sparqlEndpoint <https://dbpedia.org/sparql> 
+    ];
     slds:iriTranslators (
         [
             slds:backendPrefix "http://dbpedia.org/"; 

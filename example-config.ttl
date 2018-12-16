@@ -2,9 +2,12 @@
 
 <> 
     slds:port 5000 ;
-    slds:sparqlEndpoint <https://farewellutopia.com/sparql> ;
-    slds:iriTranslators (
-        [
-            slds:backendPrefix "https://farewellutopia.com/"; 
-            slds:frontendPrefix "http://localhost:5000/"
-        ]) .
+    slds:resourceDescriptionProvider [
+        slds:javaClass "solutions.linked.slds.providers.GraphAndContext";
+        slds:sparqlEndpoint <https://farewellutopia.com/sparql> ;
+        slds:iriTranslators (
+            [
+                slds:backendPrefix "https://farewellutopia.com/"; 
+                slds:frontendPrefix "http://localhost:5000/"
+            ]) 
+    ].
