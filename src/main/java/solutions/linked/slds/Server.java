@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package solutions.linked.slds;
 
 import io.netty.channel.Channel;
@@ -31,6 +30,9 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.clerezza.commons.rdf.Graph;
@@ -41,7 +43,14 @@ import org.apache.clerezza.rdf.utils.UnionGraph;
 import org.glassfish.jersey.netty.httpserver.NettyHttpContainerProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 
-public class Server implements Runnable{
+public class Server implements Runnable {
+
+    static {
+        //this only has the desired effect when there is a breakpint here!
+        Logger providersLogger = Logger.getLogger(org.glassfish.jersey.internal.inject.Providers.class.getCanonicalName());
+        providersLogger.info("reducing log level because of https://github.com/jersey/jersey/issues/3700");
+        providersLogger.setLevel(Level.SEVERE);
+    }
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
@@ -50,7 +59,7 @@ public class Server implements Runnable{
         }
         new Server(args).run();
     }
-    
+
     public Server(String[] args) throws FileNotFoundException {
         Graph configCraph = null;
         IRI configIRI = null; //this shall be the IRI of the first argument
@@ -58,27 +67,27 @@ public class Server implements Runnable{
 
             final File configFile = new File(args[i]);
             if (!configFile.exists()) {
-                throw new FileNotFoundException("Could not find: "+configFile.getAbsolutePath());
+                throw new FileNotFoundException("Could not find: " + configFile.getAbsolutePath());
             }
             //unfortunately this misses two slashes: configFile.toURI().toString();
-            final String configFileURI = "file://"+configFile.toURI().normalize().toString().substring(5);
+            final String configFileURI = "file://" + configFile.toURI().normalize().toString().substring(5);
             final IRI currentFileIRI = new IRI(configFileURI);
-            if (i == 0) { 
+            if (i == 0) {
                 configIRI = currentFileIRI;
             }
-            Graph currentFileConfig = Parser.getInstance().parse(new FileInputStream(configFile), 
+            Graph currentFileConfig = Parser.getInstance().parse(new FileInputStream(configFile),
                     "text/turtle", currentFileIRI);
-            configCraph = configCraph == null? currentFileConfig : new UnionGraph(configCraph, currentFileConfig);
+            configCraph = configCraph == null ? currentFileConfig : new UnionGraph(configCraph, currentFileConfig);
         }
         this.config = new GraphNode(configIRI, configCraph);
     }
-    
+
     public final GraphNode config;
 
     public Server(GraphNode config) {
         this.config = config;
     }
-    
+
     @Override
     public void run() {
         int port = Integer.parseInt(config.getLiterals(SLDS.port).next().getLexicalForm());
@@ -89,7 +98,7 @@ public class Server implements Runnable{
         }
         Channel server = NettyHttpContainerProvider.createServer(baseUri, jerseyConfig, false);
     }
-    
+
     protected Set<Object> getJaxRsComponents() {
         Set<Object> result = new HashSet<>();
         result.add(new ExceptionMapper());
@@ -107,9 +116,8 @@ public class Server implements Runnable{
     protected Object getRootResource() {
         return new ExtensibleRootResource(config);
     }
-    
+
     /*protected ResourceDescriptionProvider getResourceDescriptionProvider() {
         return Resou
     }*/
-
 }
