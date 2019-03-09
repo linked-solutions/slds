@@ -29,11 +29,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.ws.rs.Path;
-import org.apache.clerezza.commons.rdf.Graph;
-import org.apache.clerezza.commons.rdf.IRI;
-import org.apache.clerezza.rdf.utils.GraphNode;
-import org.apache.clerezza.rdf.utils.UnionGraph;
-
+import org.apache.clerezza.api.utils.GraphNode;
+import org.apache.clerezza.api.utils.UnionGraph;
+import org.apache.clerezza.api.Graph;
+import org.apache.clerezza.api.IRI;
 /**
  * The class looks for instances of xlds:ResourceDescriptionProvider in the
  * configuration and create the respective instances.

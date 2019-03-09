@@ -1,6 +1,6 @@
 package solutions.linked.slds;
 
-import org.apache.clerezza.commons.rdf.IRI;
+import org.apache.clerezza.api.IRI;
 
 /**
  * The ontology as java constants

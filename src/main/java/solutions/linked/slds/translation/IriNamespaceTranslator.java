@@ -1,8 +1,8 @@
 package solutions.linked.slds.translation;
 
-import org.apache.clerezza.commons.rdf.Graph;
-import org.apache.clerezza.commons.rdf.IRI;
-import org.apache.clerezza.rdf.utils.UriMutatingGraph;
+import org.apache.clerezza.api.utils.UriMutatingGraph;
+import org.apache.clerezza.api.Graph;
+import org.apache.clerezza.api.IRI;
 
 
 public class IriNamespaceTranslator implements IriTranslator {

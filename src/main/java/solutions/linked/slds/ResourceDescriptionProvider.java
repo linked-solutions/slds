@@ -23,8 +23,8 @@
  */
 package solutions.linked.slds;
 
-import org.apache.clerezza.commons.rdf.Graph;
-import org.apache.clerezza.commons.rdf.IRI;
+import org.apache.clerezza.api.Graph;
+import org.apache.clerezza.api.IRI;
 
 /**
  *

@@ -25,11 +25,12 @@ package solutions.linked.slds.providers;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import org.apache.clerezza.commons.rdf.Graph;
-import org.apache.clerezza.commons.rdf.IRI;
-import org.apache.clerezza.commons.rdf.impl.utils.simple.SimpleGraph;
-import org.apache.clerezza.rdf.core.serializedform.Parser;
-import org.apache.clerezza.rdf.utils.GraphNode;
+import org.apache.clerezza.api.impl.graph.SimpleGraph;
+import org.apache.clerezza.api.utils.GraphNode;
+import org.apache.clerezza.api.Graph;
+import org.apache.clerezza.api.IRI;
+import org.apache.clerezza.representation.Parser;
+
 import solutions.linked.slds.ResourceDescriptionProvider;
 import solutions.linked.slds.SLDS;
 import solutions.linked.slds.translation.IriTranslator;

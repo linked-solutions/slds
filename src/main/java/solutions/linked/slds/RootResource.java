@@ -31,9 +31,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
-import org.apache.clerezza.commons.rdf.Graph;
-import org.apache.clerezza.commons.rdf.IRI;
-import org.apache.clerezza.rdf.utils.GraphNode;
+import org.apache.clerezza.api.utils.GraphNode;
+import org.apache.clerezza.api.Graph;
+import org.apache.clerezza.api.IRI;
 import solutions.linked.slds.util.IriTranslatorProvider;
 
 @Path("")

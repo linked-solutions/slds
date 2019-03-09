@@ -30,16 +30,18 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.MessageBodyWriter;
-import org.apache.clerezza.commons.rdf.Graph;
-import org.apache.clerezza.commons.rdf.IRI;
-import org.apache.clerezza.rdf.core.serializedform.Parser;
-import org.apache.clerezza.rdf.utils.GraphNode;
-import org.apache.clerezza.rdf.utils.UnionGraph;
+import org.apache.clerezza.api.utils.GraphNode;
+import org.apache.clerezza.api.Graph;
+import org.apache.clerezza.api.IRI;
+import org.apache.clerezza.api.utils.UnionGraph;
+import org.apache.clerezza.jaxrs.rdf.providers.GraphWriter;
+import org.apache.clerezza.representation.Parser;
+import org.apache.clerezza.representation.Serializer;
+
 import org.glassfish.jersey.netty.httpserver.NettyHttpContainerProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -110,7 +112,9 @@ public class Server implements Runnable {
     }
 
     protected MessageBodyWriter getGraphMBW() {
-        return new MyGraphWriter();
+        GraphWriter graphWriter = new GraphWriter();
+        graphWriter.setSerializer(Serializer.getInstance());
+        return graphWriter;
     }
 
     protected Object getRootResource() {

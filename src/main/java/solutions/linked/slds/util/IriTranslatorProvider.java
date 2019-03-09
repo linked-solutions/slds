@@ -23,8 +23,9 @@
  */
 package solutions.linked.slds.util;
 
-import org.apache.clerezza.rdf.ontologies.RDF;
-import org.apache.clerezza.rdf.utils.GraphNode;
+
+import org.apache.clerezza.api.utils.GraphNode;
+import org.apache.clerezza.ontologies.RDF;
 import solutions.linked.slds.SLDS;
 import solutions.linked.slds.translation.ChainedIriTranslator;
 import solutions.linked.slds.translation.IriNamespaceTranslator;

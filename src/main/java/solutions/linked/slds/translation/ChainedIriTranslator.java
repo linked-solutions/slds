@@ -1,7 +1,7 @@
 package solutions.linked.slds.translation;
 
-import org.apache.clerezza.commons.rdf.Graph;
-import org.apache.clerezza.commons.rdf.IRI;
+import org.apache.clerezza.api.Graph;
+import org.apache.clerezza.api.IRI;
 
 public class ChainedIriTranslator implements IriTranslator {
     
