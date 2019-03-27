@@ -44,6 +44,10 @@ public class EffectiveRequestUriFilter implements ContainerRequestFilter {
 	public void filter(ContainerRequestContext requestContext) throws IOException {
         final URI requestUri = requestContext.getUriInfo().getRequestUri();
         final String hostHeader = requestContext.getHeaders().getFirst("Host");
+        if (hostHeader == null) {
+            System.out.println("WARN: No Host header in request");
+            return;
+        }
         final int hostHeaderSeparator = hostHeader.indexOf(':');
         final String host = hostHeaderSeparator > -1 ? 
                 hostHeader.substring(0, hostHeaderSeparator)
