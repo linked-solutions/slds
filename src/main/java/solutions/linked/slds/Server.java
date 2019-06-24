@@ -30,7 +30,6 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
@@ -105,6 +104,7 @@ public class Server implements Runnable {
         result.add(getRootResource());
         result.add(getGraphMBW());
         result.add(new CORSFilter());
+        result.add(new VaryFilter());
         result.add(new EffectiveRequestUriFilter());
         return result;
     }

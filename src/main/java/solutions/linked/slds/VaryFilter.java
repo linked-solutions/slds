@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 FactsMission AG, Switzerland.
+ * Copyright 2017-19 FactsMission AG, Switzerland.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,17 +31,13 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public class CORSFilter implements ContainerResponseFilter {
+public class VaryFilter implements ContainerResponseFilter {
 
-   @Override
-   public void filter(final ContainerRequestContext requestContext,
-                      final ContainerResponseContext cres) throws IOException {
-      cres.getHeaders().putSingle("Access-Control-Allow-Origin", "*");
-      cres.getHeaders().putSingle("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
-      cres.getHeaders().putSingle("Access-Control-Allow-Credentials", "false");
-      cres.getHeaders().putSingle("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
-      cres.getHeaders().putSingle("Access-Control-Max-Age", "1209600");
-      HeaderUtil.addValue(cres.getHeaders(), "Vary", "Origin");
-   }
+    @Override
+    public void filter(final ContainerRequestContext requestContext,
+            final ContainerResponseContext cres) throws IOException {
+        HeaderUtil.addValue(cres.getHeaders(), "Vary", "Accept");
+    }
+    
 
 }
