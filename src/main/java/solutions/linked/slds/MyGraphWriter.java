@@ -22,8 +22,8 @@ import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
  */
 @Provider
 @Produces({
-    SupportedFormat.RDF_XML, SupportedFormat.TURTLE,
-    SupportedFormat.N3, SupportedFormat.N_TRIPLE, "application/ld+json"})
+    SupportedFormat.RDF_XML+"; qs=0.5", SupportedFormat.TURTLE+"; qs=0.6",
+    SupportedFormat.N3+"; qs=0.4", SupportedFormat.N_TRIPLE+"; qs=0.5", "application/ld+json; qs=0.4"})
 @Priority(100)
 public class MyGraphWriter extends GraphWriter {
 
