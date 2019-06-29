@@ -21,7 +21,7 @@ import org.apache.clerezza.commons.rdf.Graph;
  */
 
 @Provider
-@Produces({"*/*"})
+@Produces({"*/*; qs=0.01"})
 @Priority(Integer.MAX_VALUE)
 public class DummyWriter implements MessageBodyWriter<Graph> {
 
