@@ -23,33 +23,25 @@
  */
 package solutions.linked.slds;
 
-import io.netty.channel.Channel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.ws.rs.core.UriBuilder;
+import java.net.InetSocketAddress;
 import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.commons.rdf.IRI;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.clerezza.rdf.utils.UnionGraph;
-import org.glassfish.jersey.netty.httpserver.NettyHttpContainerProvider;
-import org.glassfish.jersey.server.ResourceConfig;
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import javax.ws.rs.core.Application;
+import org.jboss.resteasy.plugins.server.sun.http.HttpContextBuilder;
 
 public class Server implements Runnable {
 
-    static {
-        //this only has the desired effect when there is a breakpint here!
-        Logger providersLogger = Logger.getLogger(org.glassfish.jersey.internal.inject.Providers.class.getCanonicalName());
-        providersLogger.info("reducing log level because of https://github.com/jersey/jersey/issues/3700");
-        providersLogger.setLevel(Level.SEVERE);
-    }
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
@@ -90,19 +82,28 @@ public class Server implements Runnable {
     @Override
     public void run() {
         int port = Integer.parseInt(config.getLiterals(SLDS.port).next().getLexicalForm());
-        URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
-        ResourceConfig jerseyConfig = new ResourceConfig();
-        for (Object jaxRsComponent : getJaxRsComponents()) {
-            jerseyConfig.register(jaxRsComponent);
+        HttpServer server;
+        try {
+            server = HttpServer.create(new InetSocketAddress(port), 1);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
-        Channel server = NettyHttpContainerProvider.createServer(baseUri, jerseyConfig, false);
+        HttpContextBuilder contextBuilder = new HttpContextBuilder();
+        contextBuilder.getDeployment().setApplication(new Application() {
+            @Override
+            public Set<Object> getSingletons() {
+                return getJaxRsComponents();
+            }
+        });
+        contextBuilder.bind(server);
+        server.start();
     }
 
     protected Set<Object> getJaxRsComponents() {
         Set<Object> result = new HashSet<>();
-        result.add(new ExceptionMapper());
         result.add(getRootResource());
         result.add(getGraphMBW());
+        result.add(new DummyWriter());
         result.add(new CORSFilter());
         result.add(new VaryFilter());
         result.add(new EffectiveRequestUriFilter());
