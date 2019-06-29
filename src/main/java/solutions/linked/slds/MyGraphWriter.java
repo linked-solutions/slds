@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -23,6 +24,7 @@ import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 @Produces({
     SupportedFormat.RDF_XML, SupportedFormat.TURTLE,
     SupportedFormat.N3, SupportedFormat.N_TRIPLE, "application/ld+json"})
+@Priority(100)
 public class MyGraphWriter extends GraphWriter {
 
     public MyGraphWriter() {
