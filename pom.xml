@@ -9,13 +9,13 @@
     </parent>
     <artifactId>slds</artifactId>
     <name>Simple LD Server</name>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <scm>
         <url>https://github.com/linked-solutions/slds</url>
         <connection>scm:git:git://github.com/linked-solutions/slds.git</connection>
         <developerConnection>scm:git:git@github.com:linked-solutions/slds.git</developerConnection>
-        <tag>slds-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
