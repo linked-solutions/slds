@@ -28,8 +28,10 @@ import java.net.URI;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.commons.rdf.IRI;
@@ -55,8 +57,12 @@ public abstract class RootResource {
     @Path("{path : .*}")
     public Graph getResourceDescription(@Context HttpHeaders httpHeaders, @Context UriInfo uriInfo) throws IOException {
         final URI requestUri = uriInfo.getRequestUri();
-        IRI resource = new IRI(requestUri.toString());
-        return getGraphFor(resource);
+        final IRI resource = new IRI(requestUri.toString());
+        final Graph result = getGraphFor(resource);
+        if (result.isEmpty()) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        return result;
     }
 
     
