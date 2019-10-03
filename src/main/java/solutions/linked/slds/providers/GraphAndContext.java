@@ -82,7 +82,8 @@ public class GraphAndContext implements ResourceDescriptionProvider {
     }
     protected Enumeration<? extends InputStream> getQueryResultsAsStream(final String[] queries) throws IOException {
         
-        try (CloseableHttpClient httpClient = configUtils.createHttpClient()) {
+        CloseableHttpClient httpClient = configUtils.getHttpClient();
+        {
             return Collections.enumeration(Arrays.asList(queries).stream().map(query -> {
                 try {
                     final HttpPost httpPost = new HttpPost(configUtils.getSparqlEndpointUri().getUnicodeString());

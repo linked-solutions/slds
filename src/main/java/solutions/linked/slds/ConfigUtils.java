@@ -35,51 +35,56 @@ import org.apache.clerezza.commons.rdf.IRI;
 import org.apache.clerezza.commons.rdf.Literal;
 import org.apache.clerezza.rdf.core.LiteralFactory;
 import org.apache.clerezza.rdf.utils.GraphNode;
+import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 
 /**
  * Provides some utility-methods based on configuration.
- * 
+ *
  * @author noam
  */
 public class ConfigUtils {
-    
+
     final GraphNode config;
+    PoolingHttpClientConnectionManager cm;
 
     public ConfigUtils(GraphNode config) {
         this.config = config;
+        cm = new PoolingHttpClientConnectionManager();
+        cm.setMaxTotal(20);
+        // Increase default max connection per route to 20
+        cm.setDefaultMaxPerRoute(20);
+
+        
     }
-    
+
     /**
-     * Creates a CloseableHttpClient that authenticates using the
-     * credentials supplied in the config.
-     * 
+     * Gets a CloseableHttpClient that authenticates using the credentials
+     * supplied in the config.
+     *
      * @return the HTTP Client
      */
-    public CloseableHttpClient createHttpClient() {
-        try {
-            final HttpClientBuilder hcb = HttpClientBuilder.create();
-            final CredentialsProvider credsProvider = new BasicCredentialsProvider();
-            addCredentials(credsProvider);
-            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-                @Override
-                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    return true;
-                }
-            }).build();
-            hcb.setSSLContext(sslContext);
-            return hcb.setDefaultCredentialsProvider(credsProvider).build();
-        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
-            throw new RuntimeException(ex);
-        }
+    public CloseableHttpClient getHttpClient() {
+        final CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        addCredentials(credsProvider);
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultCredentialsProvider(credsProvider)
+                .setConnectionManager(cm)
+                .setConnectionManagerShared(true)
+                .build();
+        return httpClient;
     }
 
     protected void addCredentials(final CredentialsProvider credsProvider) {
@@ -88,7 +93,7 @@ public class ConfigUtils {
             credsProvider.setCredentials(AuthScope.ANY, credentials);
         }
     }
-    
+
     public String getUserName() {
         return getSparqlEndpointNode().getLiterals(SLDS.userName).next().getLexicalForm();
     }
@@ -101,14 +106,14 @@ public class ConfigUtils {
         try {
             return config.getObjectNodes(SLDS.sparqlEndpoint).next();
         } catch (NoSuchElementException ex) {
-            throw new NoSuchElementException("the resource "+config.getNode()+" has no "+SLDS.sparqlEndpoint+" property.");
+            throw new NoSuchElementException("the resource " + config.getNode() + " has no " + SLDS.sparqlEndpoint + " property.");
         }
     }
-    
+
     public IRI getSparqlEndpointUri() {
         return (IRI) getSparqlEndpointNode().getNode();
     }
-    
+
     public boolean enableVituosoWorkAround() {
         final Iterator<Literal> literals = config.getLiterals(SLDS.enableVituosoWorkAround);
         return (literals.hasNext() && LiteralFactory.getInstance().createObject(Boolean.class, literals.next()));
