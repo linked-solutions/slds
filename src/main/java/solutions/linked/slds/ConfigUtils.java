@@ -118,4 +118,16 @@ public class ConfigUtils {
         final Iterator<Literal> literals = config.getLiterals(SLDS.enableVituosoWorkAround);
         return (literals.hasNext() && LiteralFactory.getInstance().createObject(Boolean.class, literals.next()));
     }
+    
+    public boolean disableNamedGraph() {
+        final Iterator<Literal> literals = config.getLiterals(SLDS.disableNamedGraph);
+        return (literals.hasNext() && LiteralFactory.getInstance().createObject(Boolean.class, literals.next()));
+    }
+    
+    public boolean disableResourceContext() {
+        final Iterator<Literal> literals = config.getLiterals(SLDS.disableResourceContext);
+        return (literals.hasNext() && LiteralFactory.getInstance().createObject(Boolean.class, literals.next()));
+    }
+    
+    
 }

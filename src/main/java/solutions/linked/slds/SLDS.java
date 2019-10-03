@@ -19,6 +19,8 @@ public class SLDS {
     public static final IRI userName = new IRI("http://vocab.linked.solutions/slds#userName");
     public static final IRI password = new IRI("http://vocab.linked.solutions/slds#password");
     public static final IRI enableVituosoWorkAround = new IRI("http://vocab.linked.solutions/slds#enableVituosoWorkAround");
+    public static final IRI disableResourceContext = new IRI("http://vocab.linked.solutions/slds#disableResourceContext");
+    public static final IRI disableNamedGraph = new IRI("http://vocab.linked.solutions/slds#disableNamedGraph");
     //FileResourceDescription provider
     public static final IRI resource = new IRI("http://vocab.linked.solutions/slds#resource");
     public static final IRI file = new IRI("http://vocab.linked.solutions/slds#file");

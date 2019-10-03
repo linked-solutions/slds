@@ -119,13 +119,17 @@ public class GraphAndContext implements ResourceDescriptionProvider {
     protected String[] getQueries(IRI resource) {
         String describeQuery = "DESCRIBE <"+resource.getUnicodeString()+">";
         Set<String> resultSet = new HashSet<String>();
-        if (configUtils.enableVituosoWorkAround()) {
-            resultSet.add("define sql:describe-mode \"CBD\" "+describeQuery);
-            resultSet.add("define sql:describe-mode \"OBJCBD\" "+describeQuery);
-        } else { 
-            resultSet.add(describeQuery);
+        if (!configUtils.disableResourceContext()) {
+            if (configUtils.enableVituosoWorkAround()) {
+                resultSet.add("define sql:describe-mode \"CBD\" "+describeQuery);
+                resultSet.add("define sql:describe-mode \"OBJCBD\" "+describeQuery);
+            } else { 
+                resultSet.add(describeQuery);
+            }
         }
-        resultSet.add("CONSTRUCT {?sub ?pred ?obj} WHERE { GRAPH <"+resource.getUnicodeString()+"> {  ?sub ?pred ?obj . } }");
+        if (!configUtils.disableNamedGraph()) {
+            resultSet.add("CONSTRUCT {?sub ?pred ?obj} WHERE { GRAPH <"+resource.getUnicodeString()+"> {  ?sub ?pred ?obj . } }");
+        }
         return resultSet.toArray(new String[resultSet.size()]);
     }
     
