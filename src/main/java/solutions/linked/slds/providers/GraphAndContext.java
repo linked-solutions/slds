@@ -121,8 +121,7 @@ public class GraphAndContext implements ResourceDescriptionProvider {
         Set<String> resultSet = new HashSet<String>();
         if (!configUtils.disableResourceContext()) {
             if (configUtils.enableVituosoWorkAround()) {
-                resultSet.add("define sql:describe-mode \"CBD\" "+describeQuery);
-                resultSet.add("define sql:describe-mode \"OBJCBD\" "+describeQuery);
+                resultSet.add("define sql:describe-mode \"SCBD\" "+describeQuery);
             } else { 
                 resultSet.add(describeQuery);
             }
