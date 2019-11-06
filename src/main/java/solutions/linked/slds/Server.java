@@ -51,12 +51,12 @@ public class Server implements Runnable {
         new Server(args).run();
     }
 
-    public Server(String[] args) throws FileNotFoundException {
+    public static GraphNode parseConfig(String[] path2config) throws FileNotFoundException {
         Graph configCraph = null;
         IRI configIRI = null; //this shall be the IRI of the first argument
-        for (int i = 0; i < args.length; i++) {
+        for (int i = 0; i < path2config.length; i++) {
 
-            final File configFile = new File(args[i]);
+            final File configFile = new File(path2config[i]);
             if (!configFile.exists()) {
                 throw new FileNotFoundException("Could not find: " + configFile.getAbsolutePath());
             }
@@ -70,9 +70,13 @@ public class Server implements Runnable {
                     "text/turtle", currentFileIRI);
             configCraph = configCraph == null ? currentFileConfig : new UnionGraph(configCraph, currentFileConfig);
         }
-        this.config = new GraphNode(configIRI, configCraph);
+        return new GraphNode(configIRI, configCraph);
     }
-
+    
+    public Server(String[] args) throws FileNotFoundException {
+        this(Server.parseConfig(args));
+    }
+    
     public final GraphNode config;
 
     public Server(GraphNode config) {
