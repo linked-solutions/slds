@@ -1,4 +1,4 @@
-@prefix slds: <http://vocab.linked.solutions/slds#> .
+@prefix slds: <https://vocab.linked.solutions/slds/> .
 
 <> 
     slds:port 5000 ;
